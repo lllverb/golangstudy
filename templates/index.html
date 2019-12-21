@@ -15,9 +15,9 @@
 
 <ul>
   {{ range .quizzes }}
-  <li>問題：{{ .Quiz }}、答え：{{ .Answer }}
-    <!-- <label><a href="/detail/{{.ID}}">編集</a></label>
-    <label><a href="/delete_check/{{.ID}}">削除</a></label> -->
+  <li>問題：{{ .Question }}、答え：{{ .Answer }}
+    <label><a href="/detail/{{.ID}}">編集</a></label>
+    <label><a href="/delete_check/{{.ID}}">削除</a></label>
   </li>
   {{end}}
 </ul>
