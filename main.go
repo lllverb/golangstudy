@@ -20,6 +20,15 @@ type Quiz struct {
 	gorm.Model
 	Question string
 	Answer   string
+	Choices  []Choice
+}
+
+type Choice struct {
+	gorm.Model
+	Quiz    Quiz `gorm:"foreignkey:QuizID"`
+	QuizId  int
+	Text    string
+	Correct int
 }
 
 //DB初期化
@@ -28,19 +37,31 @@ func dbInit() {
 	if err != nil {
 		panic("データベース開けず！（dbInit）")
 	}
-	db.AutoMigrate(&Quiz{})
+	db.AutoMigrate(&Quiz{}, &Choice{})
 	defer db.Close()
 }
 
 //DB追加
-func create(question string, answer string) {
+func create(question string, answer string, text string, correct, int) {
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
 	if err != nil {
 		panic("データベース開けず！（dbInsert)")
 	}
 	db.Create(&Quiz{Question: question, Answer: answer})
+	db.Last(&Quiz)
+	db.Create(&Choice{Text: text, Correct: correct})
 	defer db.Close()
 }
+
+// 選択肢追加
+// func createChoice(id int, text string, correct int) {
+// 	db, err := gorm.Open("sqlite3", "test.sqlite3")
+// 	if err != nil {
+// 		panic("データベース開けず！（dbInsert)")
+// 	}
+// 	db.Create(&Choice{QuizId: id, Text: text, Correct: correct})
+// 	defer db.Close()
+// }
 
 // //DB更新
 func dbUpdate(id int, question string, answer string) {
@@ -123,7 +144,20 @@ func main() {
 	router.POST("/new", func(ctx *gin.Context) {
 		quiz := ctx.PostForm("quiz")
 		answer := ctx.PostForm("answer")
-		create(quiz, answer)
+		create(quiz, answer, text, correct)
+		ctx.Redirect(302, "/")
+	})
+	// 選択肢Create
+	router.POST("/createChoice/:id", func(ctx *gin.Context) {
+		n := ctx.Param("id")
+		id, err := strconv.Atoi(n)
+		if err != nil {
+			panic(err)
+		}
+		text := ctx.PostForm("text")
+		c := ctx.PostForm("correct")
+		correct, _ := strconv.Atoi(c)
+		createChoice(id, text, correct)
 		ctx.Redirect(302, "/")
 	})
 
@@ -135,11 +169,17 @@ func main() {
 			panic(err)
 		}
 		quiz := dbGetOne(id)
-
+		// db, err := gorm.Open("sqlite3", "test.sqlite3")
+		// if err != nil {
+		// 	panic("データベース開けず！（dbUpdate)")
+		// }
+		// choices := db.Preload("Choice").Find(quiz)
+		// choices := quiz.Related(&quiz)
 		html := template.Must(template.ParseFiles("templates/base.html", "templates/detail.html"))
 		router.SetHTMLTemplate(html)
 		ctx.HTML(200, "base.html", gin.H{
 			"quiz": quiz,
+			// "choices": choices,
 		})
 	})
 

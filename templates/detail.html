@@ -6,4 +6,12 @@
   <p>答え<input type="text" name="answer" size="30" value="{{.quiz.Answer}}"></p>
   <p><input type="submit" value="Send"></p>
 </form>
+
+<form method="post" action="/createChoice/{{.quiz.ID}}">
+  <p>選択肢<input type="text" name="text" size="30"></p>
+</form>
+<h3>登録済み選択肢</h3>
+{{ range .choices }}
+<li>{{.Choice}}</li>
+{{end}}
 {{end}}
