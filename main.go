@@ -34,12 +34,12 @@ func dbInit() {
 }
 
 //DB追加
-func create(question string, answer string, text string, correct int) {
+func create(question string, answer string, text1 string, correct1 int, text2 string, correct2 int, text3 string, correct3 int, text4 string, correct4 int) {
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
 	if err != nil {
 		panic("データベース開けず！（dbInsert)")
 	}
-	db.Create(&Quiz{Question: question, Answer: answer, Choices: []Choice{{Text: text, Correct: correct}}})
+	db.Create(&Quiz{Question: question, Answer: answer, Choices: []Choice{{Text: text1, Correct: correct1}, {Text: text2, Correct: correct2}, {Text: text3, Correct: correct3}, {Text: text4, Correct: correct4}}})
 	defer db.Close()
 }
 
@@ -99,26 +99,40 @@ func dbGetOne(id int) Quiz {
 
 func main() {
 	router := gin.Default()
+	router.Static("/assets", "./assets")
 	router.LoadHTMLGlob("templates/*.html")
 
 	dbInit()
 
-	//Index
+	// Index
 	router.GET("/", func(ctx *gin.Context) {
 		quizzes := dbGetAll()
 		ctx.HTML(200, "index.html", gin.H{
 			"quizzes": quizzes,
 		})
 	})
+	// New
+	router.GET("/new", func(ctx *gin.Context) {
+		ctx.HTML(200, "new.html", gin.H{})
+	})
 
 	//Create
 	router.POST("/new", func(ctx *gin.Context) {
 		quiz := ctx.PostForm("quiz")
 		answer := ctx.PostForm("answer")
-		text := ctx.PostForm("text")
-		c := ctx.PostForm("correct")
-		correct, _ := strconv.Atoi(c)
-		create(quiz, answer, text, correct)
+		text1 := ctx.PostForm("text1")
+		c1 := ctx.PostForm("correct")
+		correct1, _ := strconv.Atoi(c1)
+		text2 := ctx.PostForm("text2")
+		c2 := ctx.PostForm("correct")
+		correct2, _ := strconv.Atoi(c2)
+		text3 := ctx.PostForm("text3")
+		c3 := ctx.PostForm("correct")
+		correct3, _ := strconv.Atoi(c3)
+		text4 := ctx.PostForm("text4")
+		c4 := ctx.PostForm("correct")
+		correct4, _ := strconv.Atoi(c4)
+		create(quiz, answer, text1, correct1, text2, correct2, text3, correct3, text4, correct4)
 		ctx.Redirect(302, "/")
 	})
 
