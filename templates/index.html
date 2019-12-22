@@ -1,11 +1,22 @@
 {{template "head"}}
-<ul>
-  {{ range .quizzes }}
-  <li>問題：{{ .Question }}、答え：{{ .Answer }}、 選択肢:{{ range .Choices }}{{ .Text }}{{ end }}
-    <label><a href="/detail/{{.ID}}">編集</a></label>
-    <label><a href="/delete_check/{{.ID}}">削除</a></label>
-  </li>
-  {{end}}
-</ul>
+<div class="container">
+  {{ range $i, $q := .quizzes }}
+    <div class="quiz-container">
+      <div class="quiz-title">
+        問題{{$i}}：{{ .Question }}
+      </div>
+      <div class="quiz-answer">
+        答え：{{ .Answer }}、
+      </div>
+      <div class="quiz-choices">
+        {{ range .Choices }}
+        <div class="quiz-choice">
+          {{ .Text }}
+        </div>
+        {{ end }}
+      </div>
+      {{end}}
+  </div>
+</div>
 <a href="/new">問題投稿</a>
 {{template "foot"}}

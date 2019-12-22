@@ -185,6 +185,34 @@ func main() {
 	// 	ctx.Redirect(302, "/")
 
 	// })
-
+	// render html template
+	// router.Use(render.Renderer(render.Options{
+	// 	Funcs: []template.FuncMap{ // レンダラにテンプレート関数を登録します。
+	// 		{
+	// 			"add": func(a, b int) int { return a + b },
+	// 			"sub": func(a, b int) int { return a - b },
+	// 			"mul": func(a, b int) int { return a * b },
+	// 			"div": func(a, b int) int { return a / b },
+	// 		},
+	// 	},
+	// }))
+	// ExampleTemplateCalculator()
 	router.Run()
 }
+
+// func ExampleTemplateCalculator(w http.ResponseWriter, r *http.Request) {
+// 	funcMap := template.FuncMap{
+// 		"add": func(a, b int) int { return a + b },
+// 		"sub": func(a, b int) int { return a - b },
+// 		"mul": func(a, b int) int { return a * b },
+// 		"div": func(a, b int) int { return a / b },
+// 	}
+// 	tp := template.Must(template.New("index.html").Funcs(funcMap).Parse("index.html"))
+// 	err := tp.Execute(w, params)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Output:
+// 	// 10
+// }
