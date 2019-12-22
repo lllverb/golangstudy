@@ -9,7 +9,7 @@
 
 <h3>登録済み選択肢</h3>
 <ul>
-  {{ range .choices }}
+  {{ range .quiz.Choices }}
     <li>{{ .Text }}</li>
   {{end}}
 </ul>

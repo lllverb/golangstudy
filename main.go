@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -76,6 +77,8 @@ func dbGetAll() []Quiz {
 	}
 	var quizzes []Quiz
 	db.Order("created_at desc").Find(&quizzes)
+	db.Preload("Choices").Find(&quizzes)
+	// fmt.Println(quizzes.Choices)
 	db.Close()
 	return quizzes
 }
@@ -88,19 +91,10 @@ func dbGetOne(id int) Quiz {
 	}
 	var quiz Quiz
 	db.First(&quiz, id)
+	db.Preload("Choices").Find(&quiz)
+	fmt.Println(quiz)
 	db.Close()
 	return quiz
-}
-
-func dbGetChoices(id int) []Choice {
-	db, err := gorm.Open("sqlite3", "test.sqlite3")
-	if err != nil {
-		panic("データベース開けず！(dbGetOne())")
-	}
-	var choices []Choice
-	db.Where("quiz_id = ?", id).Find(&choices)
-	db.Close()
-	return choices
 }
 
 func main() {
@@ -112,18 +106,10 @@ func main() {
 	//Index
 	router.GET("/", func(ctx *gin.Context) {
 		quizzes := dbGetAll()
-
 		ctx.HTML(200, "index.html", gin.H{
 			"quizzes": quizzes,
 		})
 	})
-	// Sample
-	// router.GET("/sample", func(ctx *gin.Context) {
-	// 	quizzes := dbGetAll()
-	// 	ctx.HTML(200, "base.html", gin.H{
-	// 		"quizzes": quizzes,
-	// 	})
-	// })
 
 	//Create
 	router.POST("/new", func(ctx *gin.Context) {
@@ -144,11 +130,10 @@ func main() {
 			panic(err)
 		}
 		quiz := dbGetOne(id)
-		choices := dbGetChoices(id)
 		ctx.HTML(200, "detail.html", gin.H{
-			"quiz":    quiz,
-			"choices": choices,
+			"quiz": quiz,
 		})
+		fmt.Println(quiz.Question)
 	})
 
 	// Update
