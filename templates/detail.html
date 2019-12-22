@@ -1,4 +1,4 @@
-{{define "content"}}
+{{template "head"}}
 
 <h2>編集</h2>
 <form method="post" action="/update/{{.quiz.ID}}">
@@ -7,11 +7,10 @@
   <p><input type="submit" value="Send"></p>
 </form>
 
-<form method="post" action="/createChoice/{{.quiz.ID}}">
-  <p>選択肢<input type="text" name="text" size="30"></p>
-</form>
 <h3>登録済み選択肢</h3>
-{{ range .choices }}
-<li>{{.Choice}}</li>
-{{end}}
-{{end}}
+<ul>
+  {{ range .choices }}
+    <li>{{ .Text }}</li>
+  {{end}}
+</ul>
+{{template "foot"}}

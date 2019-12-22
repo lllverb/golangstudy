@@ -3,18 +3,10 @@ package main
 import (
 	"strconv"
 
-	"html/template"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 )
-
-// type Todo struct {
-// 	gorm.Model
-// 	Text   string
-// 	Status string
-// }
 
 type Quiz struct {
 	gorm.Model
@@ -25,7 +17,6 @@ type Quiz struct {
 
 type Choice struct {
 	gorm.Model
-	Quiz    Quiz `gorm:"foreignkey:QuizID"`
 	QuizId  int
 	Text    string
 	Correct int
@@ -42,26 +33,14 @@ func dbInit() {
 }
 
 //DB追加
-func create(question string, answer string, text string, correct, int) {
+func create(question string, answer string, text string, correct int) {
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
 	if err != nil {
 		panic("データベース開けず！（dbInsert)")
 	}
-	db.Create(&Quiz{Question: question, Answer: answer})
-	db.Last(&Quiz)
-	db.Create(&Choice{Text: text, Correct: correct})
+	db.Create(&Quiz{Question: question, Answer: answer, Choices: []Choice{{Text: text, Correct: correct}}})
 	defer db.Close()
 }
-
-// 選択肢追加
-// func createChoice(id int, text string, correct int) {
-// 	db, err := gorm.Open("sqlite3", "test.sqlite3")
-// 	if err != nil {
-// 		panic("データベース開けず！（dbInsert)")
-// 	}
-// 	db.Create(&Choice{QuizId: id, Text: text, Correct: correct})
-// 	defer db.Close()
-// }
 
 // //DB更新
 func dbUpdate(id int, question string, answer string) {
@@ -113,6 +92,17 @@ func dbGetOne(id int) Quiz {
 	return quiz
 }
 
+func dbGetChoices(id int) []Choice {
+	db, err := gorm.Open("sqlite3", "test.sqlite3")
+	if err != nil {
+		panic("データベース開けず！(dbGetOne())")
+	}
+	var choices []Choice
+	db.Where("quiz_id = ?", id).Find(&choices)
+	db.Close()
+	return choices
+}
+
 func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*.html")
@@ -123,41 +113,26 @@ func main() {
 	router.GET("/", func(ctx *gin.Context) {
 		quizzes := dbGetAll()
 
-		html := template.Must(template.ParseFiles("templates/base.html", "templates/index.html"))
-		router.SetHTMLTemplate(html)
-		ctx.HTML(200, "base.html", gin.H{
+		ctx.HTML(200, "index.html", gin.H{
 			"quizzes": quizzes,
 		})
 	})
 	// Sample
-	router.GET("/sample", func(ctx *gin.Context) {
-		quizzes := dbGetAll()
-
-		html := template.Must(template.ParseFiles("templates/base.html", "templates/sample.html"))
-		router.SetHTMLTemplate(html)
-		ctx.HTML(200, "base.html", gin.H{
-			"quizzes": quizzes,
-		})
-	})
+	// router.GET("/sample", func(ctx *gin.Context) {
+	// 	quizzes := dbGetAll()
+	// 	ctx.HTML(200, "base.html", gin.H{
+	// 		"quizzes": quizzes,
+	// 	})
+	// })
 
 	//Create
 	router.POST("/new", func(ctx *gin.Context) {
 		quiz := ctx.PostForm("quiz")
 		answer := ctx.PostForm("answer")
-		create(quiz, answer, text, correct)
-		ctx.Redirect(302, "/")
-	})
-	// 選択肢Create
-	router.POST("/createChoice/:id", func(ctx *gin.Context) {
-		n := ctx.Param("id")
-		id, err := strconv.Atoi(n)
-		if err != nil {
-			panic(err)
-		}
 		text := ctx.PostForm("text")
 		c := ctx.PostForm("correct")
 		correct, _ := strconv.Atoi(c)
-		createChoice(id, text, correct)
+		create(quiz, answer, text, correct)
 		ctx.Redirect(302, "/")
 	})
 
@@ -169,17 +144,10 @@ func main() {
 			panic(err)
 		}
 		quiz := dbGetOne(id)
-		// db, err := gorm.Open("sqlite3", "test.sqlite3")
-		// if err != nil {
-		// 	panic("データベース開けず！（dbUpdate)")
-		// }
-		// choices := db.Preload("Choice").Find(quiz)
-		// choices := quiz.Related(&quiz)
-		html := template.Must(template.ParseFiles("templates/base.html", "templates/detail.html"))
-		router.SetHTMLTemplate(html)
-		ctx.HTML(200, "base.html", gin.H{
-			"quiz": quiz,
-			// "choices": choices,
+		choices := dbGetChoices(id)
+		ctx.HTML(200, "detail.html", gin.H{
+			"quiz":    quiz,
+			"choices": choices,
 		})
 	})
 
