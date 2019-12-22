@@ -7,20 +7,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
+	"gopkg.in/go-playground/validator.v8"
 )
 
 type Quiz struct {
 	gorm.Model
-	Question    string
-	Explanation string
+	Question    string `validate:"required"`
+	Explanation string `validate:"required"`
 	Choices     []Choice
 }
 
 type Choice struct {
 	gorm.Model
-	QuizId  int
-	Text    string
-	Correct int
+	QuizId  int    `validate:"required"`
+	Text    string `validate:"required"`
+	Correct int    `validate:"required"`
 }
 
 //DB初期化
@@ -33,13 +34,34 @@ func dbInit() {
 	defer db.Close()
 }
 
+var validate *validator.Validate
+
 //DB追加
 func create(question string, explanation string, text1 string, correct1 int, text2 string, correct2 int, text3 string, correct3 int, text4 string, correct4 int) {
+	config := &validator.Config{TagName: "validate"}
+	validate = validator.New(config)
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
-	if err != nil {
-		panic("データベース開けず！（dbInsert)")
+	quiz := &Quiz{Question: question, Explanation: explanation, Choices: []Choice{{Text: text1, Correct: correct1}, {Text: text2, Correct: correct2}, {Text: text3, Correct: correct3}, {Text: text4, Correct: correct4}}}
+	errs := validate.Struct(quiz)
+	if errs != nil {
+
+		fmt.Println(errs) // output: Key: "User.Age" Error:Field validation for "Age" failed on the "lte" tag
+		//	                         Key: "User.Addresses[0].City" Error:Field validation for "City" failed on the "required" tag
+		// err := errs.(validator.ValidationErrors)
+		// fmt.Println(err.Field) // output: City
+		// fmt.Println(err.Tag)   // output: required
+		// fmt.Println(err.Kind)  // output: string
+		// fmt.Println(err.Type)  // output: string
+		// fmt.Println(err.Param) // output:
+		// fmt.Println(err.Value) // output:
+
+		// from here you can create your own error messages in whatever language you wish
+		return
 	}
-	db.Create(&Quiz{Question: question, Explanation: explanation, Choices: []Choice{{Text: text1, Correct: correct1}, {Text: text2, Correct: correct2}, {Text: text3, Correct: correct3}, {Text: text4, Correct: correct4}}})
+	if err != nil {
+		panic("データベース開けず！（create)")
+	}
+	db.Create(&quiz)
 	defer db.Close()
 }
 
