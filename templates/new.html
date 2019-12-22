@@ -1,16 +1,30 @@
 {{template "head"}}
-<h2>追加</h2>
-<form method="post" action="/new">
-  <p>問題<input type="text" name="quiz" size="30" placeholder="入力してください"></p>
-  <p>答え<input type="text" name="answer" size="30" placeholder="入力してください"></p>
-  <p>選択肢1<input type="text" name="text1" size="30"></p>
-  <p>正解<input type="number" name="correct1" size="30"></p>
-  <p>選択肢2<input type="text" name="text2" size="30"></p>
-  <p>正解<input type="number" name="correct2" size="30"></p>
-  <p>選択肢3<input type="text" name="text3" size="30"></p>
-  <p>正解<input type="number" name="correct3" size="30"></p>
-  <p>選択肢4<input type="text" name="text4" size="30"></p>
-  <p>正解<input type="number" name="correct4" size="30"></p>
-  <p><input type="submit" value="Send"></p>
-</form>
+<div class="container">
+  <div class="quiz-new">
+    <h2>問題を追加</h2>
+    <form  class="quiz-new__form" method="post" action="/new">
+      <p class="quiz-new__form--question">問題文<input type="text" name="quiz" placeholder="問題文を入力してください"></p>
+      <p class="quiz-new__form--explanation">解説<input type="text" name="explanation" placeholder="解説を入力してください"></p>
+      <div class="quiz-new__form--choices">
+        <div class="choice">
+          <p>選択肢1<input type="text" name="text1"></p>
+          <p>正解or不正解<input type="text" name="correct1" placeholder="正解なら1不正解なら0"></p>
+        </div>
+        <div class="choice">
+          <p>選択肢2<input type="text" name="text2"></p>
+          <p>正解or不正解<input type="text" name="correct2" placeholder="正解なら1不正解なら0"></p>
+        </div>
+        <div class="choice">
+          <p>選択肢3<input type="text" name="text3"></p>
+          <p>正解or不正解<input type="text" name="correct3" placeholder="正解なら1不正解なら0"></p>
+        </div>
+        <div class="choice">
+          <p>選択肢4<input type="text" name="text4"></p>
+          <p>正解or不正解<input type="text" name="correct4" placeholder="正解なら1不正解なら0"></p>
+        </div>
+      </div>
+      <p class="quiz-new__form--submit"><input type="submit" value="Send"></p>
+    </form>
+  </div>
+</div>
 {{template "foot"}}

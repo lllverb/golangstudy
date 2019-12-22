@@ -11,9 +11,9 @@ import (
 
 type Quiz struct {
 	gorm.Model
-	Question string
-	Answer   string
-	Choices  []Choice
+	Question    string
+	Explanation string
+	Choices     []Choice
 }
 
 type Choice struct {
@@ -34,17 +34,17 @@ func dbInit() {
 }
 
 //DB追加
-func create(question string, answer string, text1 string, correct1 int, text2 string, correct2 int, text3 string, correct3 int, text4 string, correct4 int) {
+func create(question string, explanation string, text1 string, correct1 int, text2 string, correct2 int, text3 string, correct3 int, text4 string, correct4 int) {
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
 	if err != nil {
 		panic("データベース開けず！（dbInsert)")
 	}
-	db.Create(&Quiz{Question: question, Answer: answer, Choices: []Choice{{Text: text1, Correct: correct1}, {Text: text2, Correct: correct2}, {Text: text3, Correct: correct3}, {Text: text4, Correct: correct4}}})
+	db.Create(&Quiz{Question: question, Explanation: explanation, Choices: []Choice{{Text: text1, Correct: correct1}, {Text: text2, Correct: correct2}, {Text: text3, Correct: correct3}, {Text: text4, Correct: correct4}}})
 	defer db.Close()
 }
 
 // //DB更新
-func dbUpdate(id int, question string, answer string) {
+func dbUpdate(id int, question string, explanation string) {
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
 	if err != nil {
 		panic("データベース開けず！（dbUpdate)")
@@ -52,7 +52,7 @@ func dbUpdate(id int, question string, answer string) {
 	var quiz Quiz
 	db.First(&quiz, id)
 	quiz.Question = question
-	quiz.Answer = answer
+	quiz.Explanation = explanation
 	db.Save(&quiz)
 	db.Close()
 }
@@ -119,7 +119,7 @@ func main() {
 	//Create
 	router.POST("/new", func(ctx *gin.Context) {
 		quiz := ctx.PostForm("quiz")
-		answer := ctx.PostForm("answer")
+		explanation := ctx.PostForm("explanation")
 		text1 := ctx.PostForm("text1")
 		c1 := ctx.PostForm("correct")
 		correct1, _ := strconv.Atoi(c1)
@@ -132,7 +132,7 @@ func main() {
 		text4 := ctx.PostForm("text4")
 		c4 := ctx.PostForm("correct")
 		correct4, _ := strconv.Atoi(c4)
-		create(quiz, answer, text1, correct1, text2, correct2, text3, correct3, text4, correct4)
+		create(quiz, explanation, text1, correct1, text2, correct2, text3, correct3, text4, correct4)
 		ctx.Redirect(302, "/")
 	})
 
@@ -158,8 +158,8 @@ func main() {
 			panic("ERROR")
 		}
 		question := ctx.PostForm("question")
-		answer := ctx.PostForm("answer")
-		dbUpdate(id, question, answer)
+		explanation := ctx.PostForm("explanation")
+		dbUpdate(id, question, explanation)
 		ctx.Redirect(302, "/")
 	})
 

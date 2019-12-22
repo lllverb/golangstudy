@@ -3,7 +3,7 @@
 <h2>編集</h2>
 <form method="post" action="/update/{{.quiz.ID}}">
   <p>問題<input type="text" name="question" size="30" value="{{.quiz.Question}}"></p>
-  <p>答え<input type="text" name="answer" size="30" value="{{.quiz.Answer}}"></p>
+  <p>答え<input type="text" name="explanation" size="30" value="{{.quiz.Explanation}}"></p>
   <p><input type="submit" value="Send"></p>
 </form>
 

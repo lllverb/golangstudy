@@ -2,21 +2,26 @@
 <div class="container">
   {{ range $i, $q := .quizzes }}
     <div class="quiz-container">
-      <div class="quiz-title">
-        問題{{$i}}：{{ .Question }}
+      <div class="quiz-container__title">
+        <h2>
+          問題{{$i}}
+        </h2>
+        <h3>
+          {{ .Question }}
+        </h3>
       </div>
-      <div class="quiz-answer">
-        答え：{{ .Answer }}、
+      <div class="quiz-container__explanation">
+        答え：{{ .Explanation }}
       </div>
-      <div class="quiz-choices">
+      <div class="quiz-container__choices">
         {{ range .Choices }}
-        <div class="quiz-choice">
+        <div class="quiz-container__choices--choice">
           {{ .Text }}
         </div>
         {{ end }}
       </div>
-      {{end}}
-  </div>
+    </div>
+  {{end}}
 </div>
 <a href="/new">問題投稿</a>
 {{template "foot"}}
