@@ -19,8 +19,8 @@ type Quiz struct {
 
 type Choice struct {
 	gorm.Model
-	QuizId  int    `validate:"required"`
-	Text    string `validate:"required"`
+	QuizId  int    `validate:"-"`
+	Text    string `validate:""`
 	Correct int    `validate:"required"`
 }
 
@@ -61,7 +61,7 @@ func create(question string, explanation string, text1 string, correct1 int, tex
 	if err != nil {
 		panic("データベース開けず！（create)")
 	}
-	db.Create(&quiz)
+	db.Create(&Quiz{Question: question, Explanation: explanation, Choices: []Choice{{Text: text1, Correct: correct1}, {Text: text2, Correct: correct2}, {Text: text3, Correct: correct3}, {Text: text4, Correct: correct4}}})
 	defer db.Close()
 }
 
@@ -143,16 +143,16 @@ func main() {
 		quiz := ctx.PostForm("quiz")
 		explanation := ctx.PostForm("explanation")
 		text1 := ctx.PostForm("text1")
-		c1 := ctx.PostForm("correct")
+		c1 := ctx.PostForm("correct1")
 		correct1, _ := strconv.Atoi(c1)
 		text2 := ctx.PostForm("text2")
-		c2 := ctx.PostForm("correct")
+		c2 := ctx.PostForm("correct2")
 		correct2, _ := strconv.Atoi(c2)
 		text3 := ctx.PostForm("text3")
-		c3 := ctx.PostForm("correct")
+		c3 := ctx.PostForm("correct3")
 		correct3, _ := strconv.Atoi(c3)
 		text4 := ctx.PostForm("text4")
-		c4 := ctx.PostForm("correct")
+		c4 := ctx.PostForm("correct4")
 		correct4, _ := strconv.Atoi(c4)
 		create(quiz, explanation, text1, correct1, text2, correct2, text3, correct3, text4, correct4)
 		ctx.Redirect(302, "/")
