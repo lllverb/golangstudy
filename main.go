@@ -20,7 +20,7 @@ type Quiz struct {
 type Choice struct {
 	gorm.Model
 	QuizId  int    `validate:"-"`
-	Text    string `validate:""`
+	Text    string `validate:"required"`
 	Correct int    `validate:"required"`
 }
 
